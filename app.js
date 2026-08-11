@@ -1,15 +1,12 @@
 import express from "express";
-import { Router } from "express";
+import { createShortUrl, redirectUrl } from "./controllers/url.controller.js";
 
-const app=express();
+const app = express();
 app.use(express.json());
+app.use(express.static("public"));
 
-const router = Router();
+app.post("/api/shorten", createShortUrl);
 
-router.get("/hello", (req, res) => {
-    res.json({ message: "Hello" });
-});
-app.use(router);
+app.get("/:shortCode", redirectUrl);
 
 export default app;
-

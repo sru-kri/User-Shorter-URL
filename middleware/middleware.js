@@ -1,9 +1,18 @@
-import user from "../models/user.js";
-const user = await user.findOne({username});
-if (!user) {
-  return res.status(401).json({ message: "Invalid credentials" });
-}
-const match = await user.comparePassword(loginPassword);
-if (!match) {
-  return res.status(401).json({ message: "Invalid credentials" });
-}
+import jwt from "jsonwebtoken";
+
+export const verifyToken = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({ message: "Access denied. No token provided." });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "default_secret");
+        req.user = decoded;
+        next();
+    } catch (error) {
+        res.status(403).json({ message: "Invalid token" });
+    }
+};
